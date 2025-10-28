@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, status
 from typing import List
 from sqlalchemy.orm import Session
-from ..db import get_db
-from .. import crud, schemas
+from app.db import get_db
+from app import crud, schemas
 
 router = APIRouter(prefix="/empleados", tags=["Empleados"])
 
