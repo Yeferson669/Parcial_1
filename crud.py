@@ -3,7 +3,7 @@ from sqlalchemy import and_
 from fastapi import HTTPException
 from . import models, schemas
 
-# ---------- Empleados ----------
+
 def crear_empleado(db: Session, empleado_in: schemas.EmpleadoCreate):
     nuevo = models.Empleado(**empleado_in.dict())
     db.add(nuevo)
@@ -40,7 +40,7 @@ def eliminar_empleado(db: Session, empleado_id: int):
     emp = db.query(models.Empleado).filter(models.Empleado.id == empleado_id).first()
     if not emp:
         raise HTTPException(status_code=404, detail="Empleado no encontrado")
-    # Regla: si es gerente de proyectos, no se elimina
+
     proyectos_gerente = db.query(models.Proyecto).filter(models.Proyecto.gerente_id == emp.id).all()
     if proyectos_gerente:
         raise HTTPException(
@@ -88,12 +88,12 @@ def eliminar_proyecto(db: Session, proyecto_id: int):
     p = db.query(models.Proyecto).filter(models.Proyecto.id == proyecto_id).first()
     if not p:
         raise HTTPException(status_code=404, detail="Proyecto no encontrado")
-    # eliminar proyecto -> asignaciones eliminadas por cascade
+   
     db.delete(p)
     db.commit()
     return True
 
-# ---------- Asignaciones (N:M) ----------
+
 def asignar_empleado(db: Session, proyecto_id: int, asign_in: schemas.AsignacionIn):
     proyecto = db.query(models.Proyecto).filter(models.Proyecto.id == proyecto_id).first()
     if not proyecto:
@@ -101,7 +101,7 @@ def asignar_empleado(db: Session, proyecto_id: int, asign_in: schemas.Asignacion
     empleado = db.query(models.Empleado).filter(models.Empleado.id == asign_in.empleado_id).first()
     if not empleado:
         raise HTTPException(status_code=404, detail="Empleado no encontrado")
-    # No duplicar la asignación
+   
     existe = db.execute(
         models.asignaciones.select().where(
             and_(models.asignaciones.c.empleado_id == asign_in.empleado_id,
@@ -110,9 +110,9 @@ def asignar_empleado(db: Session, proyecto_id: int, asign_in: schemas.Asignacion
     ).first()
     if existe:
         raise HTTPException(status_code=409, detail="Empleado ya asignado a este proyecto")
-    # Usar relationship para insertar si prefieres:
+   
     proyecto.empleados.append(empleado)
-    # opcional: guardar rol en tabla asociativa si se quiere
+   
     db.commit()
     return {"message": "Asignación creada"}
 
@@ -131,7 +131,7 @@ def desasignar_empleado(db: Session, proyecto_id: int, empleado_id: int):
     ).first()
     if not existe:
         raise HTTPException(status_code=404, detail="Asignación no encontrada")
-    # borrar
+    
     db.execute(
         models.asignaciones.delete().where(
             and_(models.asignaciones.c.empleado_id == empleado_id,
@@ -141,7 +141,6 @@ def desasignar_empleado(db: Session, proyecto_id: int, empleado_id: int):
     db.commit()
     return {"message": "Asignación eliminada"}
 
-# ---------- Consultas relacionales ----------
 def proyectos_de_empleado(db: Session, empleado_id: int):
     emp = db.query(models.Empleado).filter(models.Empleado.id == empleado_id).first()
     if not emp:
