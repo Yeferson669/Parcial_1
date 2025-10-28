@@ -37,3 +37,22 @@ class ProyectoUpdate(BaseModel):
     presupuesto: Optional[float]
     estado: Optional[str]
     gerente_id: Optional[int]
+    
+    
+    class ProyectoOut(ProyectoBase):
+    id: int
+    gerente: Optional[EmpleadoOut] = None
+    empleados: List[EmpleadoOut] = []
+    class Config:
+        orm_mode = True
+
+class AsignacionIn(BaseModel):
+    empleado_id: int
+    rol: Optional[str] = None
+
+class AsignacionOut(BaseModel):
+    empleado_id: int
+    proyecto_id: int
+    rol: Optional[str] = None
+    class Config:
+        orm_mode = True
