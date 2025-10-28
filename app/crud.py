@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 from fastapi import HTTPException
-from . import models, schemas
+
+from . import schemas
+from .. import models
 
 
 def crear_empleado(db: Session, empleado_in: schemas.EmpleadoCreate):
