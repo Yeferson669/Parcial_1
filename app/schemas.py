@@ -3,7 +3,6 @@ from typing import Optional, List
 
 
 
-
 class EmpleadoBase(BaseModel):
     nombre: str = Field(..., min_length=1)
     especialidad: str = Field(..., min_length=1)
@@ -24,6 +23,7 @@ class EmpleadoOut(EmpleadoBase):
 
     class Config:
         orm_mode = True
+
 
 
 
@@ -59,10 +59,24 @@ class ProyectoUpdate(BaseModel):
     estado: Optional[str] = None
     gerente_id: Optional[int] = None
 
+
 class ProyectoOut(ProyectoBase):
     id: int
     gerente: Optional[EmpleadoOut] = None
     empleados: List[EmpleadoOut] = []
+
+    class Config:
+        orm_mode = True
+
+
+
+
+class ProyectoResumen(BaseModel):
+    id: int
+    nombre: str
+    descripcion: Optional[str] = None
+    presupuesto: float
+    estado: str
 
     class Config:
         orm_mode = True

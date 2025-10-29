@@ -7,7 +7,7 @@ from app import crud, schemas
 router = APIRouter(prefix="/proyectos", tags=["Proyectos"])
 
 
-# Crear proyecto con gerente
+
 @router.post(
     "/", 
     response_model=schemas.ProyectoOut, 
@@ -18,12 +18,13 @@ def crear_proyecto(proyecto_in: schemas.ProyectoCreate, db: Session = Depends(ge
     return crud.crear_proyecto(db, proyecto_in)
 
 
-# Listar proyectos con filtros
+
 @router.get(
     "/", 
     response_model=List[schemas.ProyectoOut], 
     summary="Listar proyectos (filtro: estado, presupuesto)"
 )
+@router.get("/", response_model=List[schemas.ProyectoResumen], summary="Listar proyectos (filtro: estado, presupuesto)")
 def listar_proyectos(
     estado: Optional[str] = None,
     presupuesto_min: Optional[float] = None,
@@ -33,7 +34,8 @@ def listar_proyectos(
     return crud.listar_proyectos(db, estado, presupuesto_min, presupuesto_max)
 
 
-# Obtener proyecto, su gerente y sus empleados
+
+
 @router.get(
     "/{proyecto_id}", 
     response_model=schemas.ProyectoOut, 
@@ -43,7 +45,7 @@ def obtener_proyecto(proyecto_id: int, db: Session = Depends(get_db)):
     return crud.obtener_proyecto(db, proyecto_id)
 
 
-# Eliminar proyecto (cascada)
+
 @router.delete(
     "/{proyecto_id}", 
     status_code=status.HTTP_204_NO_CONTENT, 
@@ -54,7 +56,7 @@ def eliminar_proyecto(proyecto_id: int, db: Session = Depends(get_db)):
     return None
 
 
-# Asignar empleado a proyecto
+
 @router.post(
     "/{proyecto_id}/asignaciones", 
     summary="Asignar empleado a proyecto"
@@ -63,7 +65,7 @@ def asignar_empleado(proyecto_id: int, asign_in: schemas.AsignacionIn, db: Sessi
     return crud.asignar_empleado(db, proyecto_id, asign_in)
 
 
-# Desasignar empleado de proyecto
+
 @router.delete(
     "/{proyecto_id}/asignaciones/{empleado_id}", 
     summary="Desasignar empleado de proyecto"
