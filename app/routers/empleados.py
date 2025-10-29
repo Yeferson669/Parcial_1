@@ -14,9 +14,10 @@ def crear_empleado(empleado: schemas.EmpleadoCreate, db: Session = Depends(get_d
 def listar_empleados(especialidad: str = None, estado: str = None, db: Session = Depends(get_db)):
     return crud.listar_empleados(db, especialidad, estado)
 
-@router.get("/{empleado_id}", response_model=schemas.EmpleadoOut, summary="Obtener empleado y sus proyectos")
+@router.get("/{empleado_id}", response_model=schemas.EmpleadoOut, summary="Obtener empleado")
 def get_empleado(empleado_id: int, db: Session = Depends(get_db)):
     return crud.obtener_empleado(db, empleado_id)
+
 
 @router.put("/{empleado_id}", response_model=schemas.EmpleadoOut, summary="Actualizar empleado")
 def update_empleado(empleado_id: int, empleado_in: schemas.EmpleadoUpdate, db: Session = Depends(get_db)):
