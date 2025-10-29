@@ -18,6 +18,9 @@ def listar_empleados(especialidad: str = None, estado: str = None, db: Session =
 def get_empleado(empleado_id: int, db: Session = Depends(get_db)):
     return crud.obtener_empleado(db, empleado_id)
 
+@router.get("/{empleado_id}/proyectos", response_model=List[schemas.ProyectoOut], summary="Listar proyectos del empleado")
+def listar_proyectos_empleado(empleado_id: int, db: Session = Depends(get_db)):
+    return crud.proyectos_de_empleado(db, empleado_id)
 
 @router.put("/{empleado_id}", response_model=schemas.EmpleadoOut, summary="Actualizar empleado")
 def update_empleado(empleado_id: int, empleado_in: schemas.EmpleadoUpdate, db: Session = Depends(get_db)):
@@ -27,3 +30,4 @@ def update_empleado(empleado_id: int, empleado_in: schemas.EmpleadoUpdate, db: S
 def delete_empleado(empleado_id: int, db: Session = Depends(get_db)):
     crud.eliminar_empleado(db, empleado_id)
     return None
+
