@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Float, ForeignKey, Text, Numeric
 from sqlalchemy.orm import relationship
 from .db import Base
 
+
 class Empleado(Base):
     __tablename__ = "empleados"
 
@@ -11,10 +12,20 @@ class Empleado(Base):
     salario = Column(Numeric(12, 2))
     estado = Column(String(30))
 
-    proyectos_gerente = relationship("Proyecto", back_populates="gerente")
-    asignaciones = relationship("Asignacion", back_populates="empleado", cascade="all, delete")
+    # Relación 1:N → Un empleado puede ser gerente de varios proyectos
+    proyectos_gerente = relationship(
+        "Proyecto",
+        back_populates="gerente",
+        cascade="all, delete-orphan"
+    )
 
-    # Relación muchos a muchos con proyectos
+    # Relación N:M → Empleado puede estar en varios proyectos
+    asignaciones = relationship(
+        "Asignacion",
+        back_populates="empleado",
+        cascade="all, delete"
+    )
+
     proyectos = relationship(
         "Proyecto",
         secondary="asignaciones",
@@ -32,10 +43,16 @@ class Proyecto(Base):
     estado = Column(String(30))
     gerente_id = Column(Integer, ForeignKey("empleados.id", ondelete="SET NULL"))
 
+    # Relación inversa del gerente
     gerente = relationship("Empleado", back_populates="proyectos_gerente")
-    asignaciones = relationship("Asignacion", back_populates="proyecto", cascade="all, delete")
 
-    # Relación muchos a muchos con empleados
+    # Relación N:M → Proyecto con varios empleados
+    asignaciones = relationship(
+        "Asignacion",
+        back_populates="proyecto",
+        cascade="all, delete"
+    )
+
     empleados = relationship(
         "Empleado",
         secondary="asignaciones",
