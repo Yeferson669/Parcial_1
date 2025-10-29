@@ -39,3 +39,8 @@ def desasignar_empleado(proyecto_id: int, empleado_id: int, db: Session = Depend
 @router.get("/{proyecto_id}/empleados")
 def empleados_de_proyecto(proyecto_id: int, db: Session = Depends(get_db)):
     return crud.empleados_de_proyecto(db, proyecto_id)
+
+
+@router.put("/{proyecto_id}/gerente/{empleado_id}")
+def asignar_gerente(proyecto_id: int, empleado_id: int, db: Session = Depends(get_db)):
+    return crud.asignar_gerente(db, proyecto_id, empleado_id)

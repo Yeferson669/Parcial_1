@@ -8,6 +8,3 @@ Base.metadata.create_all(bind=engine)
 app.include_router(empleados.router)
 app.include_router(proyectos.router)
 
-@app.get("/", summary="Raíz")
-def root():
-    return {"message": "API Sistema de Gestión de Proyectos - /docs para documentación"}

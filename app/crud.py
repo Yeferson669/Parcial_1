@@ -141,3 +141,17 @@ def empleados_de_proyecto(db: Session, proyecto_id: int):
         if gerente and gerente not in empleados:
             empleados.append(gerente)
     return {"proyecto": proyecto, "empleados": empleados}
+
+
+def asignar_gerente(db: Session, proyecto_id: int, empleado_id: int):
+    proyecto = db.query(models.Proyecto).filter(models.Proyecto.id == proyecto_id).first()
+    if not proyecto:
+        raise HTTPException(status_code=404, detail="Proyecto no encontrado")
+    empleado = db.query(models.Empleado).filter(models.Empleado.id == empleado_id).first()
+    if not empleado:
+        raise HTTPException(status_code=404, detail="Empleado no encontrado")
+    proyecto.gerente_id = empleado_id
+    db.add(proyecto)
+    db.commit()
+    db.refresh(proyecto)
+    return {"message": "Gerente asignado correctamente"}
