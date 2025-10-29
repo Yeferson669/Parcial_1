@@ -99,48 +99,44 @@ def asignar_empleado(db: Session, proyecto_id: int, asign_in: schemas.Asignacion
     proyecto = db.query(models.Proyecto).filter(models.Proyecto.id == proyecto_id).first()
     if not proyecto:
         raise HTTPException(status_code=404, detail="Proyecto no encontrado")
+
     empleado = db.query(models.Empleado).filter(models.Empleado.id == asign_in.empleado_id).first()
     if not empleado:
         raise HTTPException(status_code=404, detail="Empleado no encontrado")
-   
-    existe = db.execute(
-        models.asignaciones.select().where(
-            and_(models.asignaciones.c.empleado_id == asign_in.empleado_id,
-                 models.asignaciones.c.proyecto_id == proyecto_id)
-        )
+
+    # Verificar si ya existe la asignación
+    existe = db.query(models.Asignacion).filter(
+        models.Asignacion.empleado_id == asign_in.empleado_id,
+        models.Asignacion.proyecto_id == proyecto_id
     ).first()
     if existe:
         raise HTTPException(status_code=409, detail="Empleado ya asignado a este proyecto")
-   
-    proyecto.empleados.append(empleado)
-   
+
+    # Crear la nueva asignación
+    nueva = models.Asignacion(
+        empleado_id=asign_in.empleado_id,
+        proyecto_id=proyecto_id,
+        rol=asign_in.rol
+    )
+    db.add(nueva)
     db.commit()
-    return {"message": "Asignación creada"}
+    db.refresh(nueva)
+    return {"message": "Asignación creada correctamente"}
+
 
 def desasignar_empleado(db: Session, proyecto_id: int, empleado_id: int):
-    proyecto = db.query(models.Proyecto).filter(models.Proyecto.id == proyecto_id).first()
-    if not proyecto:
-        raise HTTPException(status_code=404, detail="Proyecto no encontrado")
-    empleado = db.query(models.Empleado).filter(models.Empleado.id == empleado_id).first()
-    if not empleado:
-        raise HTTPException(status_code=404, detail="Empleado no encontrado")
-    existe = db.execute(
-        models.asignaciones.select().where(
-            and_(models.asignaciones.c.empleado_id == empleado_id,
-                 models.asignaciones.c.proyecto_id == proyecto_id)
-        )
+    asignacion = db.query(models.Asignacion).filter(
+        models.Asignacion.proyecto_id == proyecto_id,
+        models.Asignacion.empleado_id == empleado_id
     ).first()
-    if not existe:
+
+    if not asignacion:
         raise HTTPException(status_code=404, detail="Asignación no encontrada")
-    
-    db.execute(
-        models.asignaciones.delete().where(
-            and_(models.asignaciones.c.empleado_id == empleado_id,
-                 models.asignaciones.c.proyecto_id == proyecto_id)
-        )
-    )
+
+    db.delete(asignacion)
     db.commit()
-    return {"message": "Asignación eliminada"}
+    return {"message": "Asignación eliminada correctamente"}
+
 
 def proyectos_de_empleado(db: Session, empleado_id: int):
     emp = db.query(models.Empleado).filter(models.Empleado.id == empleado_id).first()
