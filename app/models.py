@@ -1,40 +1,30 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
-from sqlalchemy.orm import relationship
-from app.db import Base
+from sqlmodel import SQLModel, Field, Relationship
+from typing import Optional, List
 
-class Empleado(Base):
-    __tablename__ = "empleados"
-
-    id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String, nullable=False)
-    especialidad = Column(String, nullable=False)
-    salario = Column(Float, nullable=False)
-    estado = Column(String, default="ACTIVO")
-
-    proyectos = relationship("Asignacion", back_populates="empleado", cascade="all, delete-orphan")
-    proyectos_dirige = relationship("Proyecto", back_populates="gerente")
+class Asignacion(SQLModel, table=True):
+    empleado_id: Optional[int] = Field(default=None, foreign_key="empleado.id", primary_key=True)
+    proyecto_id: Optional[int] = Field(default=None, foreign_key="proyecto.id", primary_key=True)
+    rol: Optional[str] = Field(default=None)
 
 
-class Proyecto(Base):
-    __tablename__ = "proyectos"
+class Proyecto(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    nombre: str = Field(index=True)
+    descripcion: Optional[str] = None
+    presupuesto: float
+    estado: Optional[str] = Field(default="PLANEADO")
+    gerente_id: Optional[int] = Field(default=None, foreign_key="empleado.id")
 
-    id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String, nullable=False, unique=True)
-    descripcion = Column(String)
-    presupuesto = Column(Float, nullable=False)
-    estado = Column(String, default="PLANEADO")
-    gerente_id = Column(Integer, ForeignKey("empleados.id"), nullable=True)
-
-    gerente = relationship("Empleado", back_populates="proyectos_dirige")
-    empleados = relationship("Asignacion", back_populates="proyecto", cascade="all, delete-orphan")
+    gerente: Optional["Empleado"] = Relationship(back_populates="proyectos_gerenciados", sa_relationship_kwargs={"lazy": "joined"})
+    empleados: List["Empleado"] = Relationship(back_populates="proyectos", link_model=Asignacion)
 
 
-class Asignacion(Base):
-    __tablename__ = "asignaciones"
+class Empleado(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    nombre: str
+    especialidad: str
+    salario: float
+    estado: Optional[str] = Field(default="ACTIVO")
 
-    empleado_id = Column(Integer, ForeignKey("empleados.id"), primary_key=True)
-    proyecto_id = Column(Integer, ForeignKey("proyectos.id"), primary_key=True)
-    rol = Column(String)
-
-    empleado = relationship("Empleado", back_populates="proyectos")
-    proyecto = relationship("Proyecto", back_populates="empleados")
+    proyectos: List[Proyecto] = Relationship(back_populates="empleados", link_model=Asignacion)
+    proyectos_gerenciados: List[Proyecto] = Relationship(back_populates="gerente", sa_relationship_kwargs={"lazy": "joined"})
