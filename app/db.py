@@ -4,7 +4,11 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./proyectos.db")
+
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_PATH = os.path.join(os.environ.get("LOCALAPPDATA", os.getcwd()), "proyectos.db")
+DATABASE_URL = f"sqlite:///{DB_PATH}"
 
 connect_args = {}
 if DATABASE_URL.startswith("sqlite"):
@@ -20,3 +24,5 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
