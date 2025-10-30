@@ -86,7 +86,7 @@ class ProyectoOutFull(ProyectoOut):
         orm_mode = True
 
 
-# resolver forward refs (por si acaso)
+
 EmpleadoOutFull.update_forward_refs()
 ProyectoOut.update_forward_refs()
 ProyectoOutFull.update_forward_refs()

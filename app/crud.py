@@ -149,7 +149,7 @@ def eliminar_proyecto(session: Session, proyecto_id: int):
     return {"message": "Proyecto eliminado correctamente"}
 
 
-# ---------- ASIGNACIONES ----------
+
 
 def asignar_empleado(session: Session, proyecto_id: int, asign_in: schemas.AsignacionIn):
     proyecto = session.get(models.Proyecto, proyecto_id)
