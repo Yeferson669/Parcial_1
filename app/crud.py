@@ -9,7 +9,7 @@ from app.db import get_session
 # ---------- EMPLEADOS ----------
 
 def crear_empleado(session: Session, empleado: schemas.EmpleadoCreate):
-    # 🔹 Validar duplicado por nombre + especialidad
+
     empleado_existente = session.exec(
         select(models.Empleado).where(
             (models.Empleado.nombre == empleado.nombre) &
